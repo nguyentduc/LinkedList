@@ -1,47 +1,33 @@
+# Directory for gtest
+
 GTEST_DIR=~/2019-2020/Embedded_Project/googletest/googletest
-PROJ=linked_list
-TEST_CASE=test_case
-#TEST_CASE=student_test
-COPTS=-fprofile-arcs -ftest-coverage
-LDFLAGS=-fprofile-arcs -ftest-coverage
 
-default: test
+#Unit test case
+test: unit_test_case.o linked_list.o Gtest_main.o libgtest.a
+	g++  unit_test_case.o linked_list.o Gtest_main.o libgtest.a -pthread -o my_test
+	rm -f *.o
 
-main: main.o $(PROJ).o
-	gcc main.o $(PROJ).o -o main
+linked_list.o: linked_list.c
+		g++ -c linked_list.c
 
-test: Gtest_main.o $(TEST_CASE).o $(PROJ)_test.o libgtest.a
-	g++ -I $(GTEST_DIR)/include -pthread $(TEST_CASE).o $(PROJ)_test.o Gtest_main.o libgtest.a $(COPTS) -o my_test
-
-######## Googletest Lib ##########
-libgtest.a:
-	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -pthread -c $(GTEST_DIR)/src/gtest-all.cc
-	ar -rv libgtest.a gtest-all.o
-##### Test ###############
 Gtest_main.o: Gtest_main.c
-	g++ -c -isystem $(GTEST_DIR)/include $(COPTS) -I$(GTEST_DIR) Gtest_main.c
+	g++ -c -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) Gtest_main.c
 
-$(PROJ)_test.o: $(PROJ).c $(PROJ).h
-	g++ -c -isystem $(GTEST_DIR)/include $(COPTS) -I$(GTEST_DIR) $(PROJ).c -o $(PROJ)_test.o
+unit_test_case.o: unit_test_case.c
+	g++ -c -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) unit_test_case.c
 
-$(TEST_CASE).o: $(TEST_CASE).c
-	g++ -c -isystem $(GTEST_DIR)/include -I$(GTEST_DIR)  $(TEST_CASE).c 
-##### Normal #######################
+libgtest.a :
+	g++ -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc
+	ar -rv libgtest.a gtest-all.o
 
-$(PROJ).o: $(PROJ).c $(PROJ).h
-	g++ -c $(PROJ).c
-
-main.o: main.c $(PROJ).h
-	gcc -c main.c
-
-###########################
 clean:
 	rm -f *.o
 
-report:
-	COV_OUTPUT=./cov_output
-	lcov -c -i -d . -o .coverage.base
-	lcov -c -d . -o .coverage.run
-	lcov -d . -a .coverage.base -a .coverage.run -o .coverage.total
-	genhtml --no-branch-coverage -o $(COV_OUTPUT) .coverage.total
-	rm -f .coverage.base .coverage.run .coverage.tota
+########Normal run
+release: linked_list.o main.o
+	g++ linked_list.o main.o -o my_test
+	
+main.o: main.c
+	g++ -c main.c
+
+
