@@ -1,6 +1,6 @@
 # Directory for gtest
 
-GTEST_DIR=~/2019-2020/Embedded_Project/googletest/googletest
+GTEST_DIR=/u/f/e1601145/2019-2020/Embedded_Project/googletest/googletest
 
 #Unit test case
 test: unit_test_case.o linked_list.o Gtest_main.o libgtest.a
